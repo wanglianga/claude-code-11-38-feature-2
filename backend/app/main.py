@@ -7,7 +7,17 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .database import Base, engine
-from .routers import analysis, auth, boundaries, citations, evidence, facts, projects, scope
+from .routers import (
+    analysis,
+    auth,
+    boundaries,
+    citations,
+    comparisons,
+    evidence,
+    facts,
+    projects,
+    scope,
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -26,7 +36,8 @@ app.add_middleware(
 )
 
 for r in (auth.router, projects.router, evidence.router, scope.router,
-          boundaries.router, facts.router, citations.router, analysis.router):
+          boundaries.router, facts.router, citations.router, analysis.router,
+          comparisons.router):
     app.include_router(r)
 
 

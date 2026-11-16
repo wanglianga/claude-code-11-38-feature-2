@@ -7,6 +7,7 @@ export const auth = reactive({
   role: localStorage.getItem('epv_role') || '',
   get loggedIn() { return !!this.token },
   get canWrite() { return this.role === 'admin' || this.role === 'analyst' },
+  get isAdmin() { return this.role === 'admin' },
 })
 
 export function setAuth(token: string, username: string, displayName: string, role: string) {

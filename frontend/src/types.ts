@@ -126,3 +126,153 @@ export interface FactTrace {
   citations: Citation[]
   meter_events: MeterEvent[]
 }
+
+// ---------- 跨项目比较 ----------
+
+export interface ComparisonRule {
+  id: number
+  code: string
+  version: number
+  status: string
+  building_use: string | null
+  climate_zone: string | null
+  occupancy_profile: string | null
+  min_baseline_days: number
+  max_baseline_days: number
+  date_tolerance_days: number
+  occupancy_cover_min: number
+  baseline_length_tolerance_days: number
+  min_common_window_days: number
+  max_area_ratio: number
+  notes: string
+  created_by: string
+  created_at: string
+  stale_workspaces?: { workspace_id: number; code: string; status: string }[]
+}
+
+export interface IntervalDto {
+  start: string | null
+  end: string | null
+}
+
+export interface ComparisonEdge {
+  id: number
+  workspace_id: number
+  project_a_id: number
+  project_b_id: number
+  project_a_code?: string
+  project_b_code?: string
+  level: string
+  eligible: boolean
+  on_global_intersection: boolean
+  stale: boolean
+  stale_reasons: any[]
+  signatures: Record<string, any>
+  window: {
+    baseline: IntervalDto
+    reporting: IntervalDto
+    candidate_baseline: IntervalDto[]
+    candidate_reporting: IntervalDto[]
+    considered_windows: any[]
+  }
+  exclusions: any[]
+  limitations: string[]
+  reasons: string[]
+  inputs: Record<string, any>
+  supported_analysis: string[]
+  rule_version: number
+  computed_at: string
+}
+
+export interface CohortProjectStatus {
+  project_id: number
+  project_code?: string
+  in_cohort: boolean
+  status: string
+  reasons: string[]
+  effect: string
+}
+
+export interface ComparisonCohort {
+  id: number
+  workspace_id: number
+  intersection: {
+    baseline: IntervalDto[]
+    reporting: IntervalDto[]
+    raw_baseline?: IntervalDto[]
+    raw_reporting?: IntervalDto[]
+    limiters?: { project_id: number; days_gained_if_removed: number; reason: string }[]
+    shared_notes?: any[]
+  }
+  members: { project_id: number; signature: Record<string, any> }[]
+  excluded_projects: any[]
+  limitations: string[]
+  reasons: string[]
+  rule_version: number
+  computed_at: string
+  project_statuses?: CohortProjectStatus[]
+}
+
+export interface ComparisonPublication {
+  id: number
+  workspace_id: number
+  version: number
+  rule_id: number
+  rule_version: number
+  project_ids: number[]
+  material_cutoff: string
+  edges_snapshot: any[]
+  cohort_snapshot: any
+  diff_from_previous: {
+    added: any[]
+    dropped: any[]
+    restricted: any[]
+    base_version: number | null
+  }
+  stale: boolean
+  stale_reasons: any[]
+  published_by: string
+  published_at: string
+}
+
+export interface ComparisonWorkspace {
+  id: number
+  code: string
+  title: string
+  rule_id: number
+  rule_version: number
+  rule_current_version: number | null
+  project_ids: number[]
+  project_codes?: string[]
+  material_cutoff: string
+  status: string
+  input_digest: string | null
+  input_changed: boolean
+  rule_superseded: boolean
+  stale_reasons: any[]
+  created_by: string
+  created_at: string
+  computed_at: string | null
+  rule?: ComparisonRule
+  edges?: ComparisonEdge[]
+  cohort?: ComparisonCohort | null
+  publications?: ComparisonPublication[]
+}
+
+export interface EdgeTrace {
+  edge: ComparisonEdge
+  workspace: ComparisonWorkspace
+  rule: ComparisonRule
+  cohort: ComparisonCohort | null
+  project_a: { id: number; code: string }
+  project_b: { id: number; code: string }
+  inputs: Record<string, any>
+  intersection: IntervalDto[]
+  common_independent_intersection: IntervalDto[]
+  exclusions: any[]
+  limitations: string[]
+  reasons: string[]
+  supported_analysis: string[]
+  recomputed_matches: boolean | null
+  note: string
+}

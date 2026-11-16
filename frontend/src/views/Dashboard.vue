@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '../api'
 import { L, tagType, fmtPct } from '../labels'
-import type { Conflict, Fact, Project } from '../types'
+import type { ComparisonWorkspace, Conflict, Fact, Project } from '../types'
+
+const router = useRouter()
 
 interface Summary {
   project: Project
@@ -20,6 +23,7 @@ interface Summary {
 const summaries = ref<Summary[]>([])
 const conflicts = ref<Conflict[]>([])
 const uncompared = ref<Fact[]>([])
+const comparisonWorkspaces = ref<ComparisonWorkspace[]>([])
 const loading = ref(true)
 
 onMounted(async () => {
@@ -27,12 +31,16 @@ onMounted(async () => {
   summaries.value = await Promise.all(projects.map(p => api.get<Summary>(`/api/projects/${p.id}/summary`)))
   conflicts.value = await api.get<Conflict[]>('/api/scope/conflicts?status=open')
   uncompared.value = await api.get<Fact[]>('/api/analysis/uncompared')
+  comparisonWorkspaces.value = await api.get<ComparisonWorkspace[]>('/api/comparisons/workspaces')
   loading.value = false
 })
 </script>
 
 <template>
   <div v-loading="loading">
+    <el-alert type="info" :closable="false" show-icon style="margin-bottom: 14px"
+              title="跨项目比较只判断比较范围与证据覆盖，不排名节能效果；可比关系不传递，共用总表不得当作两份独立样本。" />
+
     <el-row :gutter="14">
       <el-col v-for="s in summaries" :key="s.project.id" :span="6" style="margin-bottom: 14px">
         <el-card shadow="hover">
@@ -105,10 +113,48 @@ onMounted(async () => {
         </el-card>
       </el-col>
     </el-row>
+
+    <el-card>
+      <template #header>
+        <div class="head">
+          <b>跨项目比较工作区</b>
+          <span class="hint">只比较范围与证据覆盖，不排名节能效果</span>
+          <span style="flex: 1" />
+          <el-button link type="primary" @click="router.push('/comparisons')">进入比较工作区</el-button>
+        </div>
+      </template>
+      <el-table :data="comparisonWorkspaces" size="small" empty-text="暂无比较工作区">
+        <el-table-column label="工作区" min-width="180">
+          <template #default="{ row }">{{ row.code }} · {{ row.title }}</template>
+        </el-table-column>
+        <el-table-column label="规则" width="140">
+          <template #default="{ row }">{{ row.rule?.code }} v{{ row.rule_version }}</template>
+        </el-table-column>
+        <el-table-column label="项目数" width="80" align="center">
+          <template #default="{ row }">{{ row.project_ids.length }}</template>
+        </el-table-column>
+        <el-table-column label="状态" width="110">
+          <template #default="{ row }">
+            <el-tag size="small" :type="tagType('workspace_status', row.status)">
+              {{ L('workspace_status', row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="待处理" min-width="200">
+          <template #default="{ row }">
+            <span v-if="row.input_changed" class="reason">输入已变化，需重新核验</span>
+            <span v-else-if="row.rule_superseded" class="reason">规则已有新版本，旧资格不可发布</span>
+            <span v-else class="reason">-</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
 
 <style scoped>
+.head { display: flex; align-items: center; gap: 12px; }
+.head .hint { font-size: 12px; color: #999; }
 .pcode { font-size: 12px; color: #999; }
 .pname { font-weight: 600; margin: 2px 0; }
 .porg { font-size: 12px; color: #888; margin-bottom: 10px; }

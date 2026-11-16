@@ -16,6 +16,7 @@ const router = createRouter({
         { path: 'boundaries', component: () => import('./views/Boundaries.vue') },
         { path: 'facts', component: () => import('./views/Facts.vue') },
         { path: 'facts/:id', component: () => import('./views/FactDetail.vue') },
+        { path: 'comparisons', component: () => import('./views/Comparisons.vue') },
         { path: 'citations', component: () => import('./views/Citations.vue') },
       ],
     },

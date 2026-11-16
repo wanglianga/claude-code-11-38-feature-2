@@ -86,3 +86,77 @@ class CitationIn(BaseModel):
     consumer_type: str = "analysis"  # analysis / audit_view
     consumer_name: str
     purpose: str = ""
+
+
+# ---------- 跨项目比较 ----------
+
+
+class ComparisonRuleIn(BaseModel):
+    code: str
+    building_use: str | None = None
+    climate_zone: str | None = None
+    occupancy_profile: str | None = None
+    min_baseline_days: int = 300
+    max_baseline_days: int = 430
+    date_tolerance_days: int = 7
+    occupancy_cover_min: float = 1.0
+    baseline_length_tolerance_days: int = 30
+    min_common_window_days: int = 150
+    max_area_ratio: float = 2.0
+    notes: str = ""
+
+
+class ComparisonProfileIn(BaseModel):
+    building_use: str
+    climate_zone: str
+    occupancy_profile: str
+    area_m2: float = 0.0
+    includes_dining: bool = False
+    includes_public_load: bool = False
+    shared_load_keys: list[str] = Field(default_factory=list)
+    description: str = ""
+
+
+class OccupancyWindowIn(BaseModel):
+    project_id: int
+    valid_from: datetime
+    valid_to: datetime
+    label: str = ""
+
+
+class MeterCoverageWindowIn(BaseModel):
+    project_id: int
+    meter_serial: str
+    valid_from: datetime
+    valid_to: datetime
+    independent: bool = True
+    has_allocation_basis: bool = False
+    verified: bool = True
+    shared_with_project_id: int | None = None
+    evidence_ids: list[int] = Field(default_factory=list)
+    note: str = ""
+
+
+class WorkspaceIn(BaseModel):
+    code: str
+    title: str
+    rule_id: int
+    project_ids: list[int]
+    material_cutoff: datetime
+    compute: bool = True  # 创建后立即核验
+
+
+class WorkspaceUpdateIn(BaseModel):
+    title: str | None = None
+    rule_id: int | None = None
+    project_ids: list[int] | None = None
+    material_cutoff: datetime | None = None
+    reason: str = ""
+
+
+class SourceCorrectionIn(BaseModel):
+    project_ids: list[int]
+    source_ref: str
+    evidence_id: int | None = None
+    source_types: list[str] = Field(default_factory=list)
+    source_ids: list[int] = Field(default_factory=list)

@@ -28,6 +28,28 @@ export const labels: Record<string, Record<string, string>> = {
   evidence_status: { active: '有效', superseded: '已被取代' },
   conflict_type: { duplicate_coverage: '重复覆盖冲突', transfer_pending: '转移待核' },
   conflict_status: { open: '未处理', resolved: '已解决' },
+  building_use: {
+    school: '学校', office: '办公', hospital: '医疗', library: '图书馆',
+    sports: '体育', cultural: '文化',
+  },
+  climate_zone: {
+    severe_cold: '严寒', cold: '寒冷', hot_summer_cold_winter: '夏热冬冷',
+    hot_summer_warm_winter: '夏热冬暖', mild: '温和',
+  },
+  occupancy_profile: { year_round: '全年开放', term_time: '学期/工作日', seasonal: '季节性' },
+  rule_status: { draft: '草稿', active: '生效', superseded: '已被取代' },
+  workspace_status: {
+    draft: '草稿', computed: '已核验', stale: '已过期', published: '已发布', withdrawn: '已撤回',
+  },
+  edge_level: { comparable: '可比', restricted: '受限可比', blocked: '不可比' },
+  cohort_status: { member: '入选', excluded: '已排除', limiter: '限制交集' },
+  analysis_type: {
+    pairwise_scope_check: '项目对范围核验',
+    evidence_coverage_check: '证据覆盖核验',
+    local_scope_compare: '局部范围对照',
+    conditional_local_compare: '附条件局部对照',
+    scope_gap_analysis: '范围缺口分析',
+  },
 }
 
 export function L(group: string, key: string | null | undefined): string {
@@ -49,6 +71,12 @@ export function tagType(group: string, key: string | null | undefined): string {
     result_kind: { direct_metering: 'primary', controlled_allocation: 'warning' },
     pipeline_kind: { dedicated: 'success', shared: 'warning' },
     evidence_strength: { strong: 'success', moderate: 'primary', weak: 'danger' },
+    edge_level: { comparable: 'success', restricted: 'warning', blocked: 'danger' },
+    workspace_status: {
+      draft: 'info', computed: 'primary', stale: 'danger', published: 'success', withdrawn: 'info',
+    },
+    rule_status: { draft: 'info', active: 'success', superseded: 'info' },
+    cohort_status: { member: 'success', excluded: 'danger', limiter: 'warning' },
   }
   return map[group]?.[key ?? ''] ?? 'info'
 }

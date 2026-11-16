@@ -24,6 +24,7 @@ function logout() {
         <el-menu-item index="/scope">改造范围册</el-menu-item>
         <el-menu-item index="/boundaries">计量边界册</el-menu-item>
         <el-menu-item index="/facts">绩效事实</el-menu-item>
+        <el-menu-item index="/comparisons">跨项目比较</el-menu-item>
         <el-menu-item index="/citations">引用簿</el-menu-item>
       </el-menu>
       <div class="disclaimer">本平台不替代项目审批、预算调剂、拨款、施工安排或设备采购</div>
